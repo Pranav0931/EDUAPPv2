@@ -1,202 +1,231 @@
-# EduApp — Inclusive Learning Platform
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-3.11-02569B?logo=flutter&logoColor=white" alt="Flutter">
+  <img src="https://img.shields.io/badge/Dart-3.11-0175C2?logo=dart&logoColor=white" alt="Dart">
+  <img src="https://img.shields.io/badge/Material_3-Enabled-681B98" alt="Material 3">
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" alt="Android">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
+  <img src="https://img.shields.io/badge/Version-2.4.0-blue" alt="Version">
+</p>
 
-> A production-ready Flutter mobile app for **blind and deaf students** (Class 1–9) featuring audio lessons, video lessons with captions, quizzes, and full accessibility support.
+<h1 align="center">📚 EduApp</h1>
+<h3 align="center">Inclusive Learning Platform for Blind & Deaf Students</h3>
 
----
+<p align="center">
+  A Flutter mobile application designed to make education accessible for <b>blind and deaf students</b> from Class 1 to Class 9, featuring audio lessons with TTS, video lessons with live captions, interactive quizzes, and comprehensive accessibility support.
+</p>
 
-## Project Overview
-
-| Field | Detail |
-|-------|--------|
-| **App Name** | EduApp |
-| **Version** | 2.4.0 |
-| **Platform** | Android (Flutter) |
-| **Design Source** | [Stitch Project 849892866353914343](https://stitch.withgoogle.com/projects/849892866353914343) |
-| **Design Theme** | Light mode, Primary `#681B98`, Font: Inter, Roundness: 12px |
-| **Architecture** | Clean Architecture with Feature-based folders |
-| **State Management** | Provider |
-
----
-
-## What We Are Building
-
-EduApp is an inclusive education platform that helps students from **Class 1 to Class 9** learn school subjects through two accessibility modes:
-
-- **Audio Mode (Blind Students)** — Text-to-speech navigation, audio lessons, spoken button labels via `flutter_tts`
-- **Video Mode (Deaf Students)** — Video lessons with live captions, visual concept cards, highlighted keywords
-
-**Core Features:**
-- Splash → Learning Mode Selection → Home → Subjects → Lessons → Quizzes
-- 9 class cards with colorful gradients
-- 4 subjects: English, Mathematics, Science, Balbharti
-- Audio player with visualizer, speed controls (0.5x–2.0x)
-- Video player with captions, key visual points, gesture guide
-- Quiz system with timer, image questions, A/B/C/D options
-- Profile with XP progress, streaks, achievements, daily challenges
-- Settings with accessibility toggles (TalkBack, High Contrast, Large Text, Haptic)
-- Bottom navigation: Home, Quizzes, Profile, Settings
-- Ask AI floating action button
+<p align="center">
+  <a href="https://stitch.withgoogle.com/projects/849892866353914343">🎨 View Design on Google Stitch</a>
+</p>
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-| Package | Purpose |
-|---------|---------|
-| `flutter` (Material 3) | UI framework |
-| `provider` ^6.1.2 | State management |
-| `flutter_tts` ^4.2.0 | Text-to-speech for blind users |
-| `video_player` ^2.9.3 | Video lesson playback |
-| `audioplayers` ^6.1.0 | Audio lesson playback |
-| `shared_preferences` ^2.3.4 | Persistent user settings |
-| `google_fonts` ^6.2.1 | Inter font (matches Stitch design) |
+### 🎯 Core Learning
+- **9 Class Levels** — Class 1 through Class 9 with colorful gradient cards
+- **4 Subjects** — English, Mathematics, Science, Balbharti with progress tracking
+- **Audio Lessons** — Large play button, audio visualizer, playback speed control (0.5x–2.0x)
+- **Video Lessons** — Video player with live captions, volume control, fullscreen, key visual concept cards
+- **Interactive Quizzes** — Timed questions with image support, A/B/C/D options, progress tracking
+
+### ♿ Accessibility (Built-In)
+- **Audio Mode (Blind Users)** — Text-to-speech via `flutter_tts`, every button speaks its label on tap
+- **Video Mode (Deaf Users)** — Always-on captions, highlighted keywords, visual concept cards, gesture guide
+- **TalkBack Support** — Screen reader optimized with `Semantics` on every interactive element
+- **High Contrast Mode** — Enhanced visual clarity toggle
+- **Large Text Mode** — 1.3x text scaling across the entire app
+- **Haptic Feedback** — Vibration on every interaction
+- **Large Tap Areas** — Minimum 48dp touch targets
+
+### 👤 Gamification & Progress
+- **XP System** — Earn experience points for completing lessons
+- **Daily Streaks** — Track consecutive learning days
+- **Achievements** — Fast Learner, Quiz Master, 7-Day Hero badges
+- **Daily Challenges** — Bonus XP for completing extra tasks
+- **Profile** — Level badge, XP progress bar, achievement showcase
+
+### ⚙️ Customization
+- **Dark Mode** — Full dark theme support
+- **Language Selector** — Multi-language ready
+- **Notification Controls** — Daily reminder toggles
+- **Sign Out** — Account management
 
 ---
 
-## Project Structure
+## 📱 Screens
+
+| Screen | Description |
+|--------|-------------|
+| **Splash** | Purple-blue gradient, education icon, loading indicator, auto-navigation |
+| **Learning Mode** | Choose Audio Mode (blind) or Video Mode (deaf) |
+| **Home** | Welcome header, 3×3 class grid, Ask AI FAB, bottom navigation |
+| **Subjects** | Subject cards with icons, progress bars, completion percentages |
+| **Video Lesson** | Video player with captions, visual key points, bookmark, gesture guide |
+| **Audio Lesson** | Circular play button with pulse animation, visualizer, speed slider |
+| **Quiz** | Timer, progress bar, image questions, highlighted option selection |
+| **Profile** | Avatar, level badge, XP bar, streak card, achievements, daily challenge |
+| **Settings** | 4 accessibility toggles, language, notifications, dark mode, sign out |
+
+---
+
+## 🏗️ Architecture
 
 ```
 lib/
 ├── main.dart                              # App entry, MultiProvider, routes
-│
 ├── core/
 │   ├── accessibility/
 │   │   └── accessibility_provider.dart    # TTS, learning mode, a11y toggles
 │   ├── constants/
-│   │   ├── app_constants.dart             # App name, prefs keys, class count
+│   │   ├── app_constants.dart             # App config & preference keys
 │   │   └── app_routes.dart                # Named route constants
 │   ├── theme/
-│   │   ├── app_colors.dart                # All colors, gradients (Stitch)
-│   │   └── app_theme.dart                 # Light/dark Material 3 themes
+│   │   ├── app_colors.dart                # Colors & gradients from Stitch design
+│   │   └── app_theme.dart                 # Material 3 light/dark themes
 │   └── utils/
 │       └── settings_provider.dart         # Dark mode, notifications, language
-│
 ├── features/
-│   ├── splash/
-│   │   └── splash_screen.dart             # Gradient bg, icon, title, auto-nav
-│   ├── learning_mode/
-│   │   └── learning_mode_screen.dart      # Audio/Video mode selector cards
-│   ├── home/
-│   │   └── home_screen.dart               # Header, 3×3 class grid, Ask AI FAB
-│   ├── subjects/
-│   │   └── subjects_screen.dart           # Subject list with progress bars
-│   ├── video_player/
-│   │   └── video_lesson_screen.dart       # Video player, captions, visuals
-│   ├── audio_player/
-│   │   └── audio_lesson_screen.dart       # Audio player, visualizer, speed
-│   ├── quizzes/
-│   │   └── quiz_screen.dart               # Question card, options, timer
-│   ├── profile/
-│   │   └── profile_screen.dart            # XP, streak, achievements, challenge
-│   └── settings/
-│       └── settings_screen.dart           # A11y toggles, general settings
-│
+│   ├── splash/                            # Splash screen
+│   ├── learning_mode/                     # Audio/Video mode selector
+│   ├── home/                              # Home with class grid
+│   ├── subjects/                          # Subject list with progress
+│   ├── video_player/                      # Video lesson (deaf mode)
+│   ├── audio_player/                      # Audio lesson (blind mode)
+│   ├── quizzes/                           # Quiz system
+│   ├── profile/                           # User profile & gamification
+│   └── settings/                          # App settings
 └── widgets/
-    ├── accessibility_widgets/
-    │   ├── semantic_wrapper.dart           # Reusable Semantics wrapper
-    │   └── speak_on_tap.dart              # TTS on tap wrapper
-    ├── buttons/
-    │   ├── accessible_icon_button.dart    # IconButton with semantics + TTS
-    │   └── primary_button.dart            # Gradient primary button
-    ├── cards/
-    │   ├── gradient_card.dart             # Gradient background card
-    │   └── subject_card.dart              # Subject card with progress
-    ├── navigation/
-    │   └── bottom_nav_bar.dart            # 4-tab bottom nav
-    └── progress_components/
-        ├── quiz_progress.dart             # Quiz progress indicator
-        └── xp_progress_bar.dart           # XP progress bar
+    ├── accessibility_widgets/             # SemanticWrapper, SpeakOnTap
+    ├── buttons/                           # AccessibleIconButton, PrimaryButton
+    ├── cards/                             # GradientCard, SubjectCard
+    ├── navigation/                        # BottomNavBar
+    └── progress_components/               # QuizProgress, XpProgressBar
+```
+
+**Design Principles:**
+- **Clean Architecture** — Feature-based folder structure
+- **Reusable Widgets** — 10 shared components with accessibility built-in
+- **State Management** — Provider with `ChangeNotifier`
+- **Named Routes** — 9 declarative routes
+- **Responsive Layout** — Adaptive grids and flexible layouts
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|-----------|---------|
+| **Flutter 3.11** | Cross-platform UI framework |
+| **Dart 3.11** | Programming language |
+| **Material 3** | Design system |
+| **Provider 6.1** | State management |
+| **flutter_tts 4.2** | Text-to-speech for blind users |
+| **video_player 2.9** | Video lesson playback |
+| **audioplayers 6.1** | Audio lesson playback |
+| **shared_preferences 2.3** | Persistent local storage |
+| **google_fonts 6.2** | Inter font (matches Stitch design) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Flutter SDK 3.11+
+- Android Studio / VS Code
+- Android device or emulator
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Pranav0931/EDUAPPv2.git
+cd EDUAPPv2
+
+# Install dependencies
+flutter pub get
+
+# Run on connected device
+flutter run
+
+# Build release APK
+flutter build apk --release
+```
+
+### Verify Setup
+
+```bash
+flutter doctor    # Check environment
+flutter analyze   # Zero issues ✅
 ```
 
 ---
 
-## Routing
+## 🎨 Design Reference
 
-| Route | Screen | Description |
-|-------|--------|-------------|
-| `/` | SplashScreen | Gradient bg, auto-navigates to learning mode |
-| `/learningMode` | LearningModeScreen | Choose Audio or Video mode |
-| `/home` | HomeScreen | Class grid (1–9), Ask AI button |
-| `/subjects` | SubjectsScreen | Subject list with progress bars |
-| `/lessonVideo` | VideoLessonScreen | Video player + captions (Deaf Mode) |
-| `/lessonAudio` | AudioLessonScreen | Audio player + visualizer (Blind Mode) |
-| `/quiz` | QuizScreen | Question cards, timer, A/B/C/D options |
-| `/profile` | ProfileScreen | XP, streak, achievements |
-| `/settings` | SettingsScreen | Accessibility & general toggles |
+The UI was designed in **Google Stitch** and faithfully replicated in Flutter.
 
----
+| Design Token | Value |
+|-------------|-------|
+| Primary Color | `#681B98` |
+| Secondary Color | `#4A90D9` |
+| Font | Inter (Google Fonts) |
+| Border Radius | 12px |
+| Theme | Material 3, Light + Dark |
 
-## Stitch Design Screens (Project 849892866353914343)
-
-| # | Screen ID | Title | Visible | Matched |
-|---|-----------|-------|---------|---------|
-| 1 | `c9215f75` | Splash Screen | ✅ | ✅ |
-| 2 | `2aaa6f81` | Mode Selection Screen | ✅ | ✅ |
-| 3 | `896ac92e` | Home Screen | ✅ | ✅ |
-| 4 | `c33185b4` | Subjects Screen | ✅ | ✅ |
-| 5 | `9145791b` | Audio Lesson (Unit 3 Science) | ✅ | ✅ |
-| 6 | `957730d4` | Video Lesson (Enhanced) | ✅ | ✅ |
-| 7 | `d3db7a39` | Video Lesson (Child-Friendly) | ✅ | ✅ |
-| 8 | `2e549d4a` | Science Quiz | ✅ | ✅ |
-| 9 | `f7e6b3ff` | Profile Screen | ✅ | ✅ |
-| 10 | `d1359445` | Settings Screen | ✅ | ✅ |
-| — | 14 hidden screens | Variants/drafts | Hidden | N/A |
+**[View Full Design →](https://stitch.withgoogle.com/projects/849892866353914343)**
 
 ---
 
-## Build Progress
+## 🗺️ Routing
 
-### Phase 1: Core Setup — ✅ COMPLETE
-- [x] Flutter project scaffold (`edu_app`)
-- [x] pubspec.yaml with all dependencies
-- [x] App colors from Stitch design (`#681B98` primary)
-- [x] Material 3 light/dark theme
-- [x] Named routes (9 routes)
-- [x] AccessibilityProvider (TTS, mode, toggles)
-- [x] SettingsProvider (dark mode, notifications, language)
-- [x] `main.dart` with MultiProvider + Consumer
+| Route | Screen |
+|-------|--------|
+| `/` | Splash Screen |
+| `/learningMode` | Learning Mode Selection |
+| `/home` | Home Screen |
+| `/subjects` | Subjects Screen |
+| `/lessonVideo` | Video Lesson (Deaf Mode) |
+| `/lessonAudio` | Audio Lesson (Blind Mode) |
+| `/quiz` | Quiz Screen |
+| `/profile` | Profile Screen |
+| `/settings` | Settings Screen |
 
-### Phase 2: All 10 Screens — ✅ COMPLETE
-- [x] Splash Screen — gradient bg, school icon, title, progress indicator, auto-nav
-- [x] Learning Mode Screen — Audio/Video mode cards with select buttons
-- [x] Home Screen — avatar, welcome text, 3×3 class grid, Ask AI FAB, bottom nav
-- [x] Subjects Screen — English/Math/Science/Balbharti with progress bars + arrows
-- [x] Video Lesson Screen — header, player controls, captions, key visual points, gesture guide, coming up next
-- [x] Audio Lesson Screen — large play button, pulse animation, visualizer, progress bar, speed controls (0.5x–2.0x)
-- [x] Quiz Screen — header, progress/timer, question card with image, A/B/C/D options, next button, report/review
-- [x] Profile Screen — avatar, Level 12 badge, XP bar (1250/2000), 15-day streak, achievements, daily challenge
-- [x] Settings Screen — Accessibility section (4 toggles) + General section (language, notifications, dark mode) + sign out
-- [x] Bottom Navigation Bar — Home, Quizzes, Profile, Settings
+---
 
-### Phase 3: Reusable Widgets — ✅ COMPLETE
-- [x] `BottomNavBar` — 4-tab navigation with route handling
-- [x] `SemanticWrapper` — accessibility semantics wrapper
-- [x] `SpeakOnTap` — TTS on tap wrapper
-- [x] `AccessibleIconButton` — icon button with semantics + TTS
-- [x] `PrimaryButton` — gradient primary button
-- [x] `GradientCard` — gradient background card
-- [x] `SubjectCard` — subject card with progress
-- [x] `QuizProgress` — quiz progress indicator
-- [x] `XPProgressBar` — experience progress bar
+## ♿ Accessibility Compliance
 
-### Phase 4: Code Quality — ✅ COMPLETE
-- [x] `flutter analyze` → **0 issues**
-- [x] `flutter build apk --debug` → **builds successfully**
-- [x] All `withOpacity()` → `withValues(alpha:)` (no deprecation warnings)
-- [x] All `activeColor` → `activeThumbColor` (no deprecation warnings)
-- [x] Semantic labels on every interactive element
+### Blind Mode
+- Every interactive element wrapped in `Semantics(label: ..., button: true)`
+- `flutter_tts` speaks labels on tap — class names, subjects, quiz answers, navigation
+- Speed-adjustable audio playback (0.5x–2.0x)
+- Haptic feedback on every interaction
 
-### Phase 5: Accessibility — ✅ COMPLETE
-- [x] `flutter_tts` integrated in AccessibilityProvider
-- [x] TTS speaks button labels on tap (Audio Mode)
-- [x] Learning mode stored in SharedPreferences
-- [x] Semantic labels on all buttons, sliders, images
-- [x] Large text mode (1.3x scale factor)
-- [x] High contrast mode toggle
-- [x] Haptic feedback on interactions
-- [x] TalkBack support toggle
-- [x] Captions enabled by default in Video Mode
-- [x] Key visual concept cards for deaf learners
+### Deaf Mode
+- Live captions always visible during video lessons
+- Key visual concept cards with icons and descriptions
+- Highlighted keywords in caption text
+- Gesture guide: swipe to change concept, double-tap to bookmark, two-finger tap to toggle captions
+
+### Universal
+- Large tap targets (minimum 48dp)
+- High contrast mode toggle
+- Large text mode (1.3x scaling)
+- Dark mode support
+- Semantic labels on all UI elements
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+<p align="center">
+  Made with ❤️ for inclusive education<br>
+  <b>EduApp v2.4.0</b>
+</p>
 
 ---
 
