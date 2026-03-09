@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Material_3-Enabled-681B98" alt="Material 3">
   <img src="https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white" alt="Android">
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
-  <img src="https://img.shields.io/badge/Version-2.4.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/Version-3.0.0-blue" alt="Version">
 </p>
 
 <h1 align="center">📚 EduApp</h1>
@@ -24,18 +24,38 @@
 
 ### 🎯 Core Learning
 - **9 Class Levels** — Class 1 through Class 9 with colorful gradient cards
-- **4 Subjects** — English, Mathematics, Science, Balbharti with progress tracking
-- **Audio Lessons** — Large play button, audio visualizer, playback speed control (0.5x–2.0x)
-- **Video Lessons** — Video player with live captions, volume control, fullscreen, key visual concept cards
-- **Interactive Quizzes** — Timed questions with image support, A/B/C/D options, progress tracking
+- **4 Subjects per Class** — English, Mathematics, Science, Balbharti with structured chapters & lessons
+- **Audio Lessons** — Real TTS playback of lesson transcripts, sentence-by-sentence reading, speed control (0.5x–2.0x), pulse animation visualizer
+- **Video Lessons** — Timer-based playback with auto-advancing captions, seekable progress bar, speed control, skip forward/backward
+- **Interactive Quizzes** — Per-lesson MCQ questions with explanations, progress bar, scoring
+- **Lesson Transcripts** — Paragraph-by-paragraph reading with "Read All" option
+
+### 🤖 Ask AI Assistant
+- **AI Chatbot** — Students can ask questions about any topic and get instant explanations
+- **Smart Navigation** — Say "Go to Class 3" or "Open profile" to navigate the app by voice/text
+- **Topic Explanations** — Answers questions about photosynthesis, vowels, math operations, and more
+- **Quick Action Chips** — One-tap shortcuts for common queries
+- **Action Buttons** — "Go there now" buttons to navigate directly from chat responses
+
+### 🆘 Emergency SOS
+- **Large SOS Button** — Pulsing emergency button with haptic pattern alerts
+- **Quick Actions** — Vibrate, Speak Alert, Flash Screen
+- **Safety Confirmation** — "I Am Safe" button to cancel alerts
+- **Works in Any Mode** — `speakAlways()` ensures alerts are heard regardless of audio/video mode
+
+### 🤟 Sign Language Dictionary
+- **Categorized Terms** — Browse sign language terms by subject category
+- **Handshape Descriptions** — Detailed instructions for each sign
+- **Search** — Find specific signs quickly
 
 ### ♿ Accessibility (Built-In)
-- **Audio Mode (Blind Users)** — Text-to-speech via `flutter_tts`, every button speaks its label on tap
-- **Video Mode (Deaf Users)** — Always-on captions, highlighted keywords, visual concept cards, gesture guide
+- **Audio Mode (Blind Users)** — Full TTS reading of lesson content, auto-read on screen entry, button announcements
+- **Video Mode (Deaf Users)** — Always-on captions synced to playback, key visual concept cards, gesture guide
 - **TalkBack Support** — Screen reader optimized with `Semantics` on every interactive element
 - **High Contrast Mode** — Enhanced visual clarity toggle
 - **Large Text Mode** — 1.3x text scaling across the entire app
-- **Haptic Feedback** — Vibration on every interaction
+- **Haptic Feedback** — Vibration on every interaction (light, medium, heavy, pattern)
+- **Configurable Voice** — Adjustable speech rate (10%–100%) and pitch (0.5x–2.0x)
 - **Large Tap Areas** — Minimum 48dp touch targets
 
 ### 👤 Gamification & Progress
@@ -59,13 +79,18 @@
 |--------|-------------|
 | **Splash** | Purple-blue gradient, education icon, loading indicator, auto-navigation |
 | **Learning Mode** | Choose Audio Mode (blind) or Video Mode (deaf) |
-| **Home** | Welcome header, 3×3 class grid, Ask AI FAB, bottom navigation |
+| **Home** | Welcome header, 3×3 class grid, Ask AI card, SOS & Sign Language quick access, Ask AI FAB |
 | **Subjects** | Subject cards with icons, progress bars, completion percentages |
-| **Video Lesson** | Video player with captions, visual key points, bookmark, gesture guide |
-| **Audio Lesson** | Circular play button with pulse animation, visualizer, speed slider |
-| **Quiz** | Timer, progress bar, image questions, highlighted option selection |
+| **Lessons List** | Chapter sections with lesson cards, duration, quiz count, mode-aware icons |
+| **Video Lesson** | Timer-based player with auto-captions, speed control, skip, key visual points, gesture guide |
+| **Audio Lesson** | Real TTS playback of transcripts, pulse animation, visualizer, speed slider, seek bar |
+| **Quiz** | Timer, progress bar, MCQ options with explanations, scoring |
+| **Ask AI** | AI chatbot with quick actions, navigation commands, topic explanations, action buttons |
+| **Sign Language** | Dictionary with categories, search, handshape descriptions |
+| **Emergency** | SOS button with haptic patterns, speak alert, flash screen, safety confirmation |
+| **Transcript** | Paragraph-by-paragraph lesson reading with Read All option |
 | **Profile** | Avatar, level badge, XP bar, streak card, achievements, daily challenge |
-| **Settings** | 4 accessibility toggles, language, notifications, dark mode, sign out |
+| **Settings** | Accessibility toggles, voice settings, language, notifications, dark mode, sign out |
 
 ---
 
@@ -85,14 +110,21 @@ lib/
 │   │   └── app_theme.dart                 # Material 3 light/dark themes
 │   └── utils/
 │       └── settings_provider.dart         # Dark mode, notifications, language
+│   └── data/
+│       └── lesson_data.dart               # Structured lesson database (Class 1-9)
 ├── features/
 │   ├── splash/                            # Splash screen
 │   ├── learning_mode/                     # Audio/Video mode selector
-│   ├── home/                              # Home with class grid
+│   ├── home/                              # Home with class grid & Ask AI
 │   ├── subjects/                          # Subject list with progress
-│   ├── video_player/                      # Video lesson (deaf mode)
-│   ├── audio_player/                      # Audio lesson (blind mode)
-│   ├── quizzes/                           # Quiz system
+│   ├── lessons/                           # Lessons list by chapter
+│   ├── video_player/                      # Video lesson with timer playback
+│   ├── audio_player/                      # Audio lesson with TTS reading
+│   ├── quizzes/                           # Quiz system with scoring
+│   ├── ask_ai/                            # AI chatbot assistant
+│   ├── sign_language/                     # Sign language dictionary
+│   ├── emergency/                         # SOS emergency screen
+│   ├── transcript/                        # Lesson transcript viewer
 │   ├── profile/                           # User profile & gamification
 │   └── settings/                          # App settings
 └── widgets/
@@ -107,7 +139,7 @@ lib/
 - **Clean Architecture** — Feature-based folder structure
 - **Reusable Widgets** — 10 shared components with accessibility built-in
 - **State Management** — Provider with `ChangeNotifier`
-- **Named Routes** — 9 declarative routes
+- **Named Routes** — 14 declarative routes
 - **Responsive Layout** — Adaptive grids and flexible layouts
 
 ---
@@ -185,9 +217,14 @@ The UI was designed in **Google Stitch** and faithfully replicated in Flutter.
 | `/learningMode` | Learning Mode Selection |
 | `/home` | Home Screen |
 | `/subjects` | Subjects Screen |
+| `/lessons` | Lessons List |
 | `/lessonVideo` | Video Lesson (Deaf Mode) |
 | `/lessonAudio` | Audio Lesson (Blind Mode) |
 | `/quiz` | Quiz Screen |
+| `/askAi` | Ask AI Chatbot |
+| `/signLanguage` | Sign Language Dictionary |
+| `/emergency` | Emergency SOS |
+| `/transcript` | Lesson Transcript |
 | `/profile` | Profile Screen |
 | `/settings` | Settings Screen |
 
@@ -224,38 +261,45 @@ This project is licensed under the MIT License.
 
 <p align="center">
   Made with ❤️ for inclusive education<br>
-  <b>EduApp v2.4.0</b>
+  <b>EduApp v3.0.0</b>
 </p>
 
 ---
 
-## What's Next (Upcoming Work)
+## 📋 Changelog (v3.0.0)
 
-### Phase 6: Real Data & Backend Integration
-- [ ] Connect actual video files via `video_player`
-- [ ] Connect actual audio files via `audioplayers`
-- [ ] Quiz data from JSON/API (not hardcoded)
-- [ ] Subject & lesson data models
-- [ ] User authentication (Firebase Auth or similar)
-- [ ] Cloud Firestore for progress tracking
-- [ ] Real student profile data
+### ✅ Completed
+- [x] Structured lesson database — Class 1-9, 4 subjects, chapters with lessons, quizzes, captions, key visual points
+- [x] Real audio playback — TTS reads lesson transcripts sentence-by-sentence with seek, speed, pause/resume
+- [x] Real video playback — Timer-based with auto-advancing captions, speed control, progress tracking
+- [x] Ask AI Assistant — Chatbot with navigation, topic explanations, quick actions
+- [x] Emergency SOS — Pulsing button, haptic patterns, speak alert, flash screen
+- [x] Sign Language Dictionary — Categorized terms with handshape descriptions
+- [x] Lesson transcripts — Paragraph-by-paragraph reading
+- [x] Quiz system with per-lesson questions and explanations
+- [x] App icon and splash screen assets
 
-### Phase 7: Enhanced Features
-- [ ] Animated page transitions between screens
-- [ ] Quiz timer countdown (currently static)
-- [ ] Quiz scoring and result screen
-- [ ] Lesson completion tracking
+### 🔜 What's Next
+
+#### Phase 4: Backend Integration
+- [ ] User authentication (Firebase Auth)
+- [ ] Cloud Firestore for progress/XP tracking
+- [ ] Real video file streaming via `video_player`
+- [ ] Real audio file streaming via `audioplayers`
+- [ ] Lesson data from API/Firestore
+
+#### Phase 5: Enhanced Features
+- [ ] Animated page transitions
+- [ ] Lesson completion tracking & progress persistence
 - [ ] Download lessons for offline use
 - [ ] Push notifications for daily challenges
-- [ ] AI Assistant screen (Ask AI button functionality)
 - [ ] Multi-language support (Hindi, Marathi)
+- [ ] AI Assistant with real LLM integration
 
-### Phase 8: Production Polish
-- [ ] App icon and splash screen assets
+#### Phase 6: Production Polish
 - [ ] Onboarding flow for first-time users
 - [ ] Error handling and loading states
 - [ ] Unit tests and widget tests
-- [ ] Integration tests
 - [ ] Performance optimization
 - [ ] Release build signing
 - [ ] Play Store listing

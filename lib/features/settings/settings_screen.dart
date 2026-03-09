@@ -109,6 +109,96 @@ class SettingsScreen extends StatelessWidget {
             semanticLabel: 'Haptic Feedback, ${accessibility.hapticFeedbackEnabled ? "enabled" : "disabled"}',
           ),
           const SizedBox(height: 24),
+          // Voice section
+          _SectionHeader(icon: Icons.record_voice_over, title: 'Voice & Speech'),
+          const SizedBox(height: 12),
+          // Speech rate
+          _SettingsTile(
+            icon: Icons.speed,
+            title: 'Speech Rate',
+            subtitle: '${(accessibility.speechRate * 100).round()}% speed',
+            trailing: SizedBox(
+              width: 140,
+              child: Semantics(
+                label: 'Speech rate, ${(accessibility.speechRate * 100).round()} percent',
+                slider: true,
+                child: Slider(
+                  value: accessibility.speechRate,
+                  min: 0.1,
+                  max: 1.0,
+                  divisions: 9,
+                  activeColor: AppColors.primary,
+                  onChanged: (v) {
+                    accessibility.setSpeechRate(v);
+                  },
+                  onChangeEnd: (v) {
+                    accessibility.speak('Speech rate set to ${(v * 100).round()} percent');
+                  },
+                ),
+              ),
+            ),
+            semanticLabel: 'Speech Rate, ${(accessibility.speechRate * 100).round()} percent',
+          ),
+          // Speech pitch
+          _SettingsTile(
+            icon: Icons.tune,
+            title: 'Speech Pitch',
+            subtitle: '${accessibility.speechPitch.toStringAsFixed(1)}x pitch',
+            trailing: SizedBox(
+              width: 140,
+              child: Semantics(
+                label: 'Speech pitch, ${accessibility.speechPitch.toStringAsFixed(1)}x',
+                slider: true,
+                child: Slider(
+                  value: accessibility.speechPitch,
+                  min: 0.5,
+                  max: 2.0,
+                  divisions: 6,
+                  activeColor: AppColors.primary,
+                  onChanged: (v) {
+                    accessibility.setSpeechPitch(v);
+                  },
+                  onChangeEnd: (v) {
+                    accessibility.speak('Pitch set to ${v.toStringAsFixed(1)}');
+                  },
+                ),
+              ),
+            ),
+            semanticLabel: 'Speech Pitch, ${accessibility.speechPitch.toStringAsFixed(1)}x',
+          ),
+          // Auto-read
+          _SettingsTile(
+            icon: Icons.auto_stories,
+            title: 'Auto-Read Content',
+            subtitle: 'Automatically read lesson content',
+            trailing: Switch(
+              value: accessibility.autoReadEnabled,
+              onChanged: (v) {
+                accessibility.triggerHaptic();
+                accessibility.toggleAutoRead(v);
+                accessibility.speak(v ? 'Auto read enabled' : 'Auto read disabled');
+              },
+              activeThumbColor: AppColors.primary,
+            ),
+            semanticLabel: 'Auto-Read, ${accessibility.autoReadEnabled ? "enabled" : "disabled"}',
+          ),
+          // Screen description
+          _SettingsTile(
+            icon: Icons.description,
+            title: 'Screen Descriptions',
+            subtitle: 'Announce screen content on entry',
+            trailing: Switch(
+              value: accessibility.screenDescriptionEnabled,
+              onChanged: (v) {
+                accessibility.triggerHaptic();
+                accessibility.toggleScreenDescription(v);
+                accessibility.speak(v ? 'Screen descriptions enabled' : 'Screen descriptions disabled');
+              },
+              activeThumbColor: AppColors.primary,
+            ),
+            semanticLabel: 'Screen Descriptions, ${accessibility.screenDescriptionEnabled ? "enabled" : "disabled"}',
+          ),
+          const SizedBox(height: 24),
           // General section
           _SectionHeader(icon: Icons.settings, title: 'General'),
           const SizedBox(height: 12),

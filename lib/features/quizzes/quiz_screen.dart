@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/accessibility/accessibility_provider.dart';
+import '../../core/data/lesson_data.dart';
 import '../../core/theme/app_colors.dart';
-import '../../widgets/navigation/bottom_nav_bar.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
@@ -13,21 +13,47 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   int _selectedOption = -1;
-  int _currentQuestion = 3;
-  final int _totalQuestions = 10;
-  int _timerSeconds = 45;
+  int _currentQuestion = 0;
+  int _correctCount = 0;
+  bool _answered = false;
+  bool _quizFinished = false;
 
-  static const _options = [
-    'Roots',
-    'Leaves',
-    'Stem',
-    'Flower',
+  List<QuizQuestion> _questions = [];
+  String _lessonTitle = 'Quiz';
+  String _unitLabel = 'Quiz';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_questions.isEmpty) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      _questions = (args?['questions'] as List<QuizQuestion>?) ?? _defaultQuestions;
+      _lessonTitle = args?['lessonTitle'] as String? ?? 'Quiz';
+      _unitLabel = args?['unitLabel'] as String? ?? 'Quiz';
+    }
+  }
+
+  static const _defaultQuestions = [
+    QuizQuestion(
+      question: 'Which part of the plant makes food using sunlight?',
+      options: ['Roots', 'Leaves', 'Stem', 'Flower'],
+      correctIndex: 1,
+      explanation: 'Leaves use sunlight to make food through photosynthesis.',
+      imageDescription: 'A healthy green plant with leaves, stem and roots visible',
+    ),
   ];
+
   static const _optionLabels = ['A', 'B', 'C', 'D'];
+
+  QuizQuestion get _current => _questions[_currentQuestion];
 
   @override
   Widget build(BuildContext context) {
     final accessibility = context.watch<AccessibilityProvider>();
+
+    if (_quizFinished) {
+      return _buildResultsScreen(context, accessibility);
+    }
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -45,17 +71,17 @@ class _QuizScreenState extends State<QuizScreen> {
                     // Progress
                     _buildProgress(context),
                     const SizedBox(height: 20),
-                    // Question card with image
+                    // Question card
                     _buildQuestionCard(context),
                     const SizedBox(height: 20),
                     // Options
                     ..._buildOptions(context, accessibility),
+                    const SizedBox(height: 16),
+                    // Explanation (after answering)
+                    if (_answered) _buildExplanation(context),
                     const SizedBox(height: 24),
                     // Next button
                     _buildNextButton(context, accessibility),
-                    const SizedBox(height: 16),
-                    // Bottom actions
-                    _buildBottomActions(context, accessibility),
                   ],
                 ),
               ),
@@ -63,7 +89,103 @@ class _QuizScreenState extends State<QuizScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+    );
+  }
+
+  Widget _buildResultsScreen(BuildContext context, AccessibilityProvider a11y) {
+    final percentage = (_correctCount / _questions.length * 100).round();
+    final passed = percentage >= 60;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      a11y.speakAlways(
+        'Quiz complete! You scored $percentage percent. $_correctCount out of ${_questions.length} correct. '
+        '${passed ? "Great job!" : "Keep practicing!"}',
+      );
+      a11y.triggerPatternHaptic(isPositive: passed);
+    });
+
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  passed ? Icons.emoji_events : Icons.refresh,
+                  size: 80,
+                  color: passed ? AppColors.success : AppColors.warning,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  passed ? 'Great Job!' : 'Keep Practicing!',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '$percentage% Score',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: passed ? AppColors.success : AppColors.warning,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$_correctCount of ${_questions.length} correct answers',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      a11y.triggerHaptic();
+                      setState(() {
+                        _currentQuestion = 0;
+                        _correctCount = 0;
+                        _selectedOption = -1;
+                        _answered = false;
+                        _quizFinished = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Try Again', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      a11y.triggerHaptic();
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text('Back to Lesson', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 16)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -86,12 +208,16 @@ class _QuizScreenState extends State<QuizScreen> {
                 ),
               ),
               const Spacer(),
-              Semantics(
-                label: 'More options',
-                button: true,
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.more_vert, color: Colors.white),
+              // Score indicator
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Score: $_correctCount/${_currentQuestion + (_answered ? 1 : 0)}',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -102,16 +228,16 @@ class _QuizScreenState extends State<QuizScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Science Quiz',
+                  _lessonTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
                   ),
-                  semanticsLabel: 'Science Quiz',
+                  semanticsLabel: _lessonTitle,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Unit 3: Plants Around Us',
+                  _unitLabel,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.8),
                   ),
@@ -129,48 +255,20 @@ class _QuizScreenState extends State<QuizScreen> {
       children: [
         Row(
           children: [
-            // Question number
             Text(
-              'Question $_currentQuestion of $_totalQuestions',
+              'Question ${_currentQuestion + 1} of ${_questions.length}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-              semanticsLabel: 'Question $_currentQuestion of $_totalQuestions',
-            ),
-            const Spacer(),
-            // Timer
-            Semantics(
-              label: '$_timerSeconds seconds remaining',
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.timer, size: 16, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      '00:${_timerSeconds.toString().padLeft(2, '0')}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              semanticsLabel: 'Question ${_currentQuestion + 1} of ${_questions.length}',
             ),
           ],
         ),
         const SizedBox(height: 12),
         Semantics(
-          label: 'Quiz progress, $_currentQuestion of $_totalQuestions questions',
+          label: 'Quiz progress, ${_currentQuestion + 1} of ${_questions.length} questions',
           child: ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: _currentQuestion / _totalQuestions,
+              value: (_currentQuestion + 1) / _questions.length,
               minHeight: 4,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               valueColor: const AlwaysStoppedAnimation(AppColors.primary),
@@ -185,104 +283,121 @@ class _QuizScreenState extends State<QuizScreen> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        children: [
-          // Image placeholder
-          Container(
-            height: 180,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8F5E9),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            ),
-            child: Semantics(
-              label: 'A healthy green plant with leaves, stem and roots visible',
-              image: true,
-              child: const Center(
-                child: Icon(Icons.eco, size: 64, color: Color(0xFF4CAF50)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            if (_current.imageDescription.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Container(
+                  height: 120,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Semantics(
+                    label: _current.imageDescription,
+                    image: true,
+                    child: const Center(
+                      child: Icon(Icons.image, size: 48, color: Color(0xFF4CAF50)),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          // Question text
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'Which part of the plant makes food using sunlight?',
+            Text(
+              _current.question,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 height: 1.3,
               ),
-              semanticsLabel: 'Which part of the plant makes food using sunlight?',
+              semanticsLabel: _current.question,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   List<Widget> _buildOptions(BuildContext context, AccessibilityProvider a11y) {
-    return List.generate(_options.length, (index) {
+    return List.generate(_current.options.length, (index) {
       final isSelected = _selectedOption == index;
+      final isCorrect = _answered && index == _current.correctIndex;
+      final isWrong = _answered && isSelected && index != _current.correctIndex;
+
+      Color bgColor = Colors.white;
+      Color borderColor = AppColors.primary.withValues(alpha: 0.2);
+      Color textColor = AppColors.textPrimary;
+
+      if (_answered) {
+        if (isCorrect) {
+          bgColor = AppColors.success;
+          borderColor = AppColors.success;
+          textColor = Colors.white;
+        } else if (isWrong) {
+          bgColor = AppColors.error;
+          borderColor = AppColors.error;
+          textColor = Colors.white;
+        }
+      } else if (isSelected) {
+        bgColor = AppColors.primary;
+        borderColor = AppColors.primary;
+        textColor = Colors.white;
+      }
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Semantics(
-          label: '${_optionLabels[index]}: ${_options[index]}${isSelected ? ', selected' : ''}',
+          label: '${_optionLabels[index]}: ${_current.options[index]}${isSelected ? ', selected' : ''}${isCorrect ? ', correct answer' : ''}${isWrong ? ', wrong answer' : ''}',
           button: true,
           selected: isSelected,
           child: InkWell(
-            onTap: () {
-              a11y.triggerHaptic();
-              setState(() => _selectedOption = index);
-              a11y.speak('${_optionLabels[index]} ${_options[index]}');
-            },
+            onTap: _answered
+                ? null
+                : () {
+                    a11y.triggerHaptic();
+                    setState(() => _selectedOption = index);
+                    a11y.speak('${_optionLabels[index]} ${_current.options[index]}');
+                  },
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.white,
+                color: bgColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.2),
-                  width: isSelected ? 2 : 1,
-                ),
-                boxShadow: isSelected
-                    ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))]
-                    : null,
+                border: Border.all(color: borderColor, width: isSelected || isCorrect ? 2 : 1),
               ),
               child: Row(
                 children: [
-                  // Letter badge
                   Container(
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.white : AppColors.optionDefault,
+                      color: (isSelected || isCorrect || isWrong) ? Colors.white.withValues(alpha: 0.3) : AppColors.optionDefault,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
-                      child: Text(
-                        _optionLabels[index],
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                        ),
-                      ),
+                      child: _answered
+                          ? Icon(
+                              isCorrect ? Icons.check : (isWrong ? Icons.close : null),
+                              color: textColor,
+                              size: 20,
+                            )
+                          : Text(
+                              _optionLabels[index],
+                              style: TextStyle(fontWeight: FontWeight.w700, color: textColor),
+                            ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      _options[index],
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
-                      ),
+                      _current.options[index],
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: textColor),
                     ),
                   ),
-                  if (isSelected)
-                    const Icon(Icons.check_circle, color: Colors.white, size: 24),
                 ],
               ),
             ),
@@ -292,70 +407,100 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  Widget _buildNextButton(BuildContext context, AccessibilityProvider a11y) {
-    return Semantics(
-      label: 'Next question',
-      button: true,
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: _selectedOption >= 0
-              ? () {
-                  a11y.triggerHaptic();
-                  a11y.speak('Next question');
-                  setState(() {
-                    if (_currentQuestion < _totalQuestions) {
-                      _currentQuestion++;
-                      _selectedOption = -1;
-                      _timerSeconds = 45;
-                    }
-                  });
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
-            padding: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  Widget _buildExplanation(BuildContext context) {
+    if (_current.explanation.isEmpty) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.lightbulb, color: AppColors.info, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              _current.explanation,
+              style: const TextStyle(color: AppColors.textPrimary, height: 1.4),
+            ),
           ),
-          icon: const Text('Next Question', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-          label: const Icon(Icons.arrow_forward),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildBottomActions(BuildContext context, AccessibilityProvider a11y) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Semantics(
-          label: 'Report issue',
-          button: true,
-          child: TextButton.icon(
-            onPressed: () {
-              a11y.triggerHaptic();
-              a11y.speak('Report issue');
-            },
-            icon: const Icon(Icons.flag, size: 18, color: AppColors.textSecondary),
-            label: const Text('Report issue', style: TextStyle(color: AppColors.textSecondary)),
+  Widget _buildNextButton(BuildContext context, AccessibilityProvider a11y) {
+    if (!_answered) {
+      // Submit answer button
+      return Semantics(
+        label: 'Submit answer',
+        button: true,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _selectedOption >= 0
+                ? () {
+                    final isCorrect = _selectedOption == _current.correctIndex;
+                    setState(() => _answered = true);
+                    if (isCorrect) {
+                      _correctCount++;
+                      a11y.triggerPatternHaptic(isPositive: true);
+                      a11y.speak('Correct! ${_current.explanation}');
+                    } else {
+                      a11y.triggerPatternHaptic(isPositive: false);
+                      a11y.speak('Wrong. The correct answer is ${_current.options[_current.correctIndex]}. ${_current.explanation}');
+                    }
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.3),
+              padding: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Text('Submit Answer', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            label: const Icon(Icons.check),
           ),
         ),
-        const SizedBox(width: 24),
-        Semantics(
-          label: 'Review later',
-          button: true,
-          child: TextButton.icon(
-            onPressed: () {
-              a11y.triggerHaptic();
-              a11y.speak('Review later');
-            },
-            icon: const Icon(Icons.visibility, size: 18, color: AppColors.textSecondary),
-            label: const Text('Review later', style: TextStyle(color: AppColors.textSecondary)),
+      );
+    }
+
+    // Next question or finish button
+    final isLast = _currentQuestion >= _questions.length - 1;
+    return Semantics(
+      label: isLast ? 'See results' : 'Next question',
+      button: true,
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            a11y.triggerHaptic();
+            if (isLast) {
+              setState(() => _quizFinished = true);
+            } else {
+              setState(() {
+                _currentQuestion++;
+                _selectedOption = -1;
+                _answered = false;
+              });
+              a11y.speak('Question ${_currentQuestion + 1} of ${_questions.length}. ${_current.question}');
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isLast ? AppColors.success : AppColors.primary,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
+          icon: Text(isLast ? 'See Results' : 'Next Question', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          label: Icon(isLast ? Icons.emoji_events : Icons.arrow_forward),
         ),
-      ],
+      ),
     );
   }
 }
